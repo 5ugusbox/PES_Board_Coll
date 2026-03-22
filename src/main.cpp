@@ -1,10 +1,14 @@
 #include "mbed.h"
 
+using namespace std::chrono;
+
 // pes board pin map
 #include "PESBoardPinMap.h"
 
 // drivers
 #include "DebounceIn.h"
+//#include "FastPWM.h"
+#include "DCMotor.h"
 
 bool do_execute_main_task = false; // this variable will be toggled via the user button (blue button) and
                                    // decides whether to execute the main task or not
@@ -19,6 +23,10 @@ void toggle_do_execute_main_fcn(); // custom function which is getting executed 
 // main runs as an own thread
 int main()
 {
+    thread_sleep_for(500); // wait for serial terminal to open
+    printf("--- PES Board System Starting ---\r\n");
+    fflush(stdout);
+
     // attach button fall function address to user button object
     user_button.fall(&toggle_do_execute_main_fcn);
 
@@ -39,6 +47,30 @@ int main()
 
     // --- adding variables and objects and applying functions starts here ---
 
+    // create object to enable power electronics for the dc motors
+    DigitalOut enable_motors(PB_ENABLE_DCMOTORS);
+
+
+    const float voltage_max = 12.0f; // maximum voltage of battery packs, adjust this to
+                                     // 6.0f V if you only use one battery pack
+
+    // motor M1
+    const float gear_ratio_M1 = 78.125f; // gear ratio
+    const float kn_M1 = 180.0f / 12.0f;  // motor constant [rpm/V]
+    DCMotor motor_M1(PB_PWM_M1, PB_ENC_A_M1, PB_ENC_B_M1, gear_ratio_M1, kn_M1, voltage_max);
+    // enable the motion planner for smooth movement
+    motor_M1.enableMotionPlanner();
+    // limit max. velocity to half physical possible velocity
+    motor_M1.setMaxVelocity(motor_M1.getMaxPhysicalVelocity() * 0.5f);
+
+    const float gear_ratio_M2 = 78.125f; // gear ratio
+    const float kn_M2 = 180.0f / 12.0f;  // motor constant [rpm/V]
+    DCMotor motor_M2(PB_PWM_M2, PB_ENC_A_M2, PB_ENC_B_M2, gear_ratio_M2, kn_M2, voltage_max);
+    // enable the motion planner for smooth movement
+    motor_M2.enableMotionPlanner();
+    // limit max. velocity to half physical possible velocity
+    motor_M2.setMaxVelocity(motor_M2.getMaxPhysicalVelocity() * 0.5f);
+
     // start timer
     main_task_timer.start();
 
@@ -54,6 +86,24 @@ int main()
 
             // visual feedback that the main task is executed, setting this once would actually be enough
             led1 = 1;
+
+            // enable hardwaredriver dc motors: 0 -> disabled, 1 -> enabled
+            enable_motors = 1;
+
+            // the following code block gets executed only once
+            if (do_reset_all_once) {
+                do_reset_all_once = false;
+
+                // --- variables and objects that should be reset go here ---
+
+                // command the motor to rotate 3 times from its current position
+                motor_M1.setRotationRelative(3.0f);
+                motor_M2.setRotationRelative(3.0f);
+
+                // reset variables and objects
+                led1 = 0;
+                // enable_motors = 0; // Keep motors enabled while task is running
+            }
         } else {
             // the following code block gets executed only once
             if (do_reset_all_once) {
@@ -63,8 +113,14 @@ int main()
 
                 // reset variables and objects
                 led1 = 0;
+                enable_motors = 0;
             }
         }
+
+        // print to the serial terminal
+        printf("M1: %f | M2: %f\n",
+            motor_M1.getRotation(),
+            motor_M2.getRotation());
 
         // toggling the user led
         user_led = !user_led;
