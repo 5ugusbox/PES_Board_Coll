@@ -24,7 +24,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a0dfdf8-4e14-4ce1-ad02-198b3e4d9500" name="Changes" comment="working state with serial monitor">
+    <list default="true" id="7a0dfdf8-4e14-4ce1-ad02-198b3e4d9500" name="Changes" comment="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
@@ -106,6 +106,9 @@
   &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="3BJKv9LPW3np19H39TL5vQcMBMt" />
+  <component name="ProjectStatusUIService"><![CDATA[{
+  "uiKindId": "Widget"
+}]]></component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -165,7 +168,7 @@
       <workItem from="1774206429430" duration="2386000" />
       <workItem from="1774209384142" duration="59000" />
       <workItem from="1774209939179" duration="1525000" />
-      <workItem from="1774294695891" duration="390000" />
+      <workItem from="1774294695891" duration="2425000" />
     </task>
     <task id="LOCAL-00001" summary="working state with serial monitor">
       <option name="closed" value="true" />
@@ -191,7 +194,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774207191604</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)">
+      <option name="closed" value="true" />
+      <created>1774295136262</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1774295136262</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -210,6 +221,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="working state with serial monitor" />
-    <option name="LAST_COMMIT_MESSAGE" value="working state with serial monitor" />
+    <MESSAGE value="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)" />
+    <option name="LAST_COMMIT_MESSAGE" value="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)" />
   </component>
 </project>

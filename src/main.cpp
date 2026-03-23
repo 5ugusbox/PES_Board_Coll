@@ -1,24 +1,24 @@
 #include "mbed.h"
-
-using namespace std::chrono;
-
-// pes board pin map
 #include "PESBoardPinMap.h"
 
 // drivers
 #include "DebounceIn.h"
 //#include "FastPWM.h"
 #include "DCMotor.h"
+#include <Eigen/Dense>
+
+#define M_PIf 3.14159265358979323846f // pi
+using namespace std::chrono;
 
 bool do_execute_main_task = false; // this variable will be toggled via the user button (blue button) and
-                                   // decides whether to execute the main task or not
-bool do_reset_all_once = false;    // this variable is used to reset certain variables and objects and
-                                   // shows how you can run a code segment only once
+// decides whether to execute the main task or not
+bool do_reset_all_once = false; // this variable is used to reset certain variables and objects and
+// shows how you can run a code segment only once
 
 // objects for user button (blue button) handling on nucleo board
-DebounceIn user_button(BUTTON1);   // create DebounceIn to evaluate the user button
+DebounceIn user_button(BUTTON1); // create DebounceIn to evaluate the user button
 void toggle_do_execute_main_fcn(); // custom function which is getting executed when user
-                                   // button gets pressed, definition at the end
+// button gets pressed, definition at the end
 
 // main runs as an own thread
 int main()
@@ -33,9 +33,9 @@ int main()
     // while loop gets executed every main_task_period_ms milliseconds, this is a
     // simple approach to repeatedly execute main
     const int main_task_period_ms = 20; // define main task period time in ms e.g. 20 ms, therefore
-                                        // the main task will run 50 times per second
-    Timer main_task_timer;              // create Timer object which we use to run the main task
-                                        // every main_task_period_ms
+    // the main task will run 50 times per second
+    Timer main_task_timer; // create Timer object which we use to run the main task
+    // every main_task_period_ms
 
     // led on nucleo board
     DigitalOut user_led(LED1);
@@ -50,48 +50,55 @@ int main()
     // create object to enable power electronics for the dc motors
     DigitalOut enable_motors(PB_ENABLE_DCMOTORS);
 
-
     const float voltage_max = 12.0f; // maximum voltage of battery packs, adjust this to
-                                     // 6.0f V if you only use one battery pack
+    // 6.0f V if you only use one battery pack
+    const float gear_ratio = 100.00f;
+    const float kn = 140.0f / 12.0f;
+    // motor M1 and M2, do NOT enable motion planner when used with the LineFollower (disabled per default)
+    DCMotor motor_M1(PB_PWM_M1, PB_ENC_A_M1, PB_ENC_B_M1, gear_ratio, kn, voltage_max);
+    DCMotor motor_M2(PB_PWM_M2, PB_ENC_A_M2, PB_ENC_B_M2, gear_ratio, kn, voltage_max);
 
-    // motor M1
-    const float gear_ratio_M1 = 78.125f; // gear ratio
-    const float kn_M1 = 180.0f / 12.0f;  // motor constant [rpm/V]
-    DCMotor motor_M1(PB_PWM_M1, PB_ENC_A_M1, PB_ENC_B_M1, gear_ratio_M1, kn_M1, voltage_max);
-    // enable the motion planner for smooth movement
-    motor_M1.enableMotionPlanner();
-    // limit max. velocity to half physical possible velocity
-    motor_M1.setMaxVelocity(motor_M1.getMaxPhysicalVelocity() * 0.5f);
-
-    const float gear_ratio_M2 = 78.125f; // gear ratio
-    const float kn_M2 = 180.0f / 12.0f;  // motor constant [rpm/V]
-    DCMotor motor_M2(PB_PWM_M2, PB_ENC_A_M2, PB_ENC_B_M2, gear_ratio_M2, kn_M2, voltage_max);
-    // enable the motion planner for smooth movement
-    motor_M2.enableMotionPlanner();
-    // limit max. velocity to half physical possible velocity
-    motor_M2.setMaxVelocity(motor_M2.getMaxPhysicalVelocity() * 0.5f);
+    // differential drive robot kinematics
+    const float r_wheel = 0.019f / 2.0f; // wheel radius in meters
+    const float b_wheel = 0.15f; // wheelbase, distance from wheel to wheel in meters
+    // transforms wheel to robot velocities
+    Eigen::Matrix2f Cwheel2robot;
+    Cwheel2robot << r_wheel / 2.0f, r_wheel / 2.0f,
+                    r_wheel / b_wheel, -r_wheel / b_wheel;
+    Eigen::Vector2f robot_coord = {0.0f, 0.0f}; // contains v and w (robot translational and rotational velocity)
+    Eigen::Vector2f wheel_speed = {0.0f, 0.0f}; // contains w1 and w2 (wheel speed)
 
     // start timer
     main_task_timer.start();
 
     // this loop will run forever
-    while (true) {
+    while (true)
+    {
         main_task_timer.reset();
 
         // --- code that runs every cycle at the start goes here ---
 
-        if (do_execute_main_task) {
-
+        if (do_execute_main_task)
+        {
             // --- code that runs when the blue button was pressed goes here ---
+            // set robot velocities
+            robot_coord(0) = 0.2f; // set desired translational velocity in m/s
+            robot_coord(1) = 0.2f; // set desired rotational velocity in rad/s
+
+            // map robot velocities to wheel velocities in rad/sec
+            wheel_speed = Cwheel2robot.inverse() * robot_coord;
+
+            // setpoints for the dc motors in rps
+            motor_M1.setVelocity(wheel_speed(0) / (2.0f * M_PIf)); // set a desired speed for speed controlled dc motors M1
+            motor_M2.setVelocity(wheel_speed(1) / (2.0f * M_PIf)); // set a desired speed for speed controlled dc motors M2
 
             // visual feedback that the main task is executed, setting this once would actually be enough
             led1 = 1;
-
-            // enable hardwaredriver dc motors: 0 -> disabled, 1 -> enabled
             enable_motors = 1;
 
             // the following code block gets executed only once
-            if (do_reset_all_once) {
+            if (do_reset_all_once)
+            {
                 do_reset_all_once = false;
 
                 // --- variables and objects that should be reset go here ---
@@ -100,14 +107,16 @@ int main()
                 motor_M2.setVelocity(motor_M2.getMaxVelocity() * 0.9f);
 
 
-
                 // reset variables and objects
                 led1 = 0;
                 // enable_motors = 0; // Keep motors enabled while task is running
             }
-        } else {
+        }
+        else
+        {
             // the following code block gets executed only once
-            if (do_reset_all_once) {
+            if (do_reset_all_once)
+            {
                 do_reset_all_once = false;
 
                 // --- variables and objects that should be reset go here ---
@@ -120,8 +129,8 @@ int main()
 
         // print to the serial terminal
         printf("M1: %f | M2: %f\n",
-            motor_M1.getVelocity(),
-            motor_M2.getVelocity());
+               motor_M1.getVelocity(),
+               motor_M2.getVelocity());
 
         // toggling the user led
         user_led = !user_led;
