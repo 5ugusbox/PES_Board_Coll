@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="BackendCodeEditorMiscSettings">
-    <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="3" type="long" />
+    <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="4" type="long" />
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
     <option name="/Default/Housekeeping/LiveTemplatesHousekeeping/HotspotSessionHintIsShown/@EntryValue" value="true" type="bool" />
@@ -24,9 +24,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a0dfdf8-4e14-4ce1-ad02-198b3e4d9500" name="Changes" comment="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)">
+    <list default="true" id="7a0dfdf8-4e14-4ce1-ad02-198b3e4d9500" name="Changes" comment="Workshop4 implemented - Code working -&gt; check with actual 20mm line">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +36,7 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="2895" />
+    <option name="cachedIndexableFilesCount" value="949" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="nucleo_f446re" />
@@ -106,9 +105,9 @@
   &quot;associatedIndex&quot;: 5
 }</component>
   <component name="ProjectId" id="3BJKv9LPW3np19H39TL5vQcMBMt" />
-  <component name="ProjectStatusUIService"><![CDATA[{
-  "uiKindId": "Widget"
-}]]></component>
+  <component name="ProjectStatusUIService">{
+  &quot;uiKindId&quot;: &quot;Widget&quot;
+}</component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -141,9 +140,9 @@
   }
 }</component>
   <component name="RunManager">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
     <configuration name="PlatformIO" type="platformio" factoryName="PlatformIO Debug" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PES_Board_Coll" TARGET_NAME="PlatformIO" CONFIG_NAME="PlatformIO">
@@ -168,7 +167,8 @@
       <workItem from="1774206429430" duration="2386000" />
       <workItem from="1774209384142" duration="59000" />
       <workItem from="1774209939179" duration="1525000" />
-      <workItem from="1774294695891" duration="2425000" />
+      <workItem from="1774294695891" duration="5021000" />
+      <workItem from="1774333835561" duration="336000" />
     </task>
     <task id="LOCAL-00001" summary="working state with serial monitor">
       <option name="closed" value="true" />
@@ -202,7 +202,23 @@
       <option name="project" value="LOCAL" />
       <updated>1774295136262</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="implemented and tested -&gt;Tutorial Differential Drive Robot Kinematics">
+      <option name="closed" value="true" />
+      <created>1774297197472</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1774297197472</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Workshop4 implemented - Code working -&gt; check with actual 20mm line">
+      <option name="closed" value="true" />
+      <created>1774299746548</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1774299746548</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -222,6 +238,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="working state with serial monitor" />
     <MESSAGE value="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)" />
-    <option name="LAST_COMMIT_MESSAGE" value="M1 and M2 const running&#10;Serial Terminal Output printf&#10;(make sure to use right USB port)" />
+    <MESSAGE value="implemented and tested -&gt;Tutorial Differential Drive Robot Kinematics" />
+    <MESSAGE value="Workshop4 implemented - Code working -&gt; check with actual 20mm line" />
+    <option name="LAST_COMMIT_MESSAGE" value="Workshop4 implemented - Code working -&gt; check with actual 20mm line" />
   </component>
 </project>

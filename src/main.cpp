@@ -6,6 +6,7 @@
 //#include "FastPWM.h"
 #include "DCMotor.h"
 #include <Eigen/Dense>
+#include "LineFollower.h"
 
 #define M_PIf 3.14159265358979323846f // pi
 using namespace std::chrono;
@@ -43,7 +44,9 @@ int main()
     // additional led
     // create DigitalOut object to command extra led, you need to add an additional resistor, e.g. 220...500 Ohm
     // a led has an anode (+) and a cathode (-), the cathode needs to be connected to ground via the resistor
-    DigitalOut led1(PB_9);
+
+    // Change from PB_9 to another pin, e.g., PB_7
+    DigitalOut led1(PB_7);
 
     // --- adding variables and objects and applying functions starts here ---
 
@@ -52,21 +55,19 @@ int main()
 
     const float voltage_max = 12.0f; // maximum voltage of battery packs, adjust this to
     // 6.0f V if you only use one battery pack
-    const float gear_ratio = 100.00f;
-    const float kn = 140.0f / 12.0f;
+    const float gear_ratio = 78.125f;
+    const float kn = 180.0f / 12.0f;
     // motor M1 and M2, do NOT enable motion planner when used with the LineFollower (disabled per default)
     DCMotor motor_M1(PB_PWM_M1, PB_ENC_A_M1, PB_ENC_B_M1, gear_ratio, kn, voltage_max);
     DCMotor motor_M2(PB_PWM_M2, PB_ENC_A_M2, PB_ENC_B_M2, gear_ratio, kn, voltage_max);
 
     // differential drive robot kinematics
-    const float r_wheel = 0.019f / 2.0f; // wheel radius in meters
-    const float b_wheel = 0.15f; // wheelbase, distance from wheel to wheel in meters
-    // transforms wheel to robot velocities
-    Eigen::Matrix2f Cwheel2robot;
-    Cwheel2robot << r_wheel / 2.0f, r_wheel / 2.0f,
-                    r_wheel / b_wheel, -r_wheel / b_wheel;
-    Eigen::Vector2f robot_coord = {0.0f, 0.0f}; // contains v and w (robot translational and rotational velocity)
-    Eigen::Vector2f wheel_speed = {0.0f, 0.0f}; // contains w1 and w2 (wheel speed)
+    const float d_wheel = 0.0372f; // wheel diameter in meters
+    const float b_wheel = 0.1518f; // wheelbase, distance from wheel to wheel in meters
+    const float bar_dist = 0.118f; // distance from wheel axis to leds on sensor bar / array in meters
+
+    // line follower, tune max. vel rps to your needs
+    LineFollower lineFollower(PB_9, PB_8, bar_dist, d_wheel, b_wheel, motor_M2.getMaxPhysicalVelocity());
 
     // start timer
     main_task_timer.start();
@@ -81,20 +82,14 @@ int main()
         if (do_execute_main_task)
         {
             // --- code that runs when the blue button was pressed goes here ---
-            // set robot velocities
-            robot_coord(0) = 0.2f; // set desired translational velocity in m/s
-            robot_coord(1) = 0.2f; // set desired rotational velocity in rad/s
-
-            // map robot velocities to wheel velocities in rad/sec
-            wheel_speed = Cwheel2robot.inverse() * robot_coord;
-
-            // setpoints for the dc motors in rps
-            motor_M1.setVelocity(wheel_speed(0) / (2.0f * M_PIf)); // set a desired speed for speed controlled dc motors M1
-            motor_M2.setVelocity(wheel_speed(1) / (2.0f * M_PIf)); // set a desired speed for speed controlled dc motors M2
 
             // visual feedback that the main task is executed, setting this once would actually be enough
             led1 = 1;
             enable_motors = 1;
+
+            // setpoints for the dc motors in rps
+            motor_M1.setVelocity(lineFollower.getRightWheelVelocity()); // set a desired speed for speed controlled dc motors M1
+            motor_M2.setVelocity(lineFollower.getLeftWheelVelocity());  // set a desired speed for speed controlled dc motors M2
 
             // the following code block gets executed only once
             if (do_reset_all_once)
@@ -103,13 +98,8 @@ int main()
 
                 // --- variables and objects that should be reset go here ---
 
-                motor_M1.setVelocity(motor_M1.getMaxVelocity() * 0.9f);
-                motor_M2.setVelocity(motor_M2.getMaxVelocity() * 0.9f);
-
-
                 // reset variables and objects
-                led1 = 0;
-                // enable_motors = 0; // Keep motors enabled while task is running
+
             }
         }
         else
@@ -122,8 +112,10 @@ int main()
                 // --- variables and objects that should be reset go here ---
 
                 // reset variables and objects
-                led1 = 0;
                 enable_motors = 0;
+                led1 = 0; // Turn LED off when stopped
+                motor_M1.setVelocity(0.0f);
+                motor_M2.setVelocity(0.0f);
             }
         }
 
