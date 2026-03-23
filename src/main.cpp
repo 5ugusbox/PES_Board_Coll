@@ -96,9 +96,10 @@ int main()
 
                 // --- variables and objects that should be reset go here ---
 
-                // command the motor to rotate 3 times from its current position
-                motor_M1.setRotationRelative(3.0f);
-                motor_M2.setRotationRelative(3.0f);
+                motor_M1.setVelocity(motor_M1.getMaxVelocity() * 0.9f);
+                motor_M2.setVelocity(motor_M2.getMaxVelocity() * 0.9f);
+
+
 
                 // reset variables and objects
                 led1 = 0;
@@ -119,8 +120,8 @@ int main()
 
         // print to the serial terminal
         printf("M1: %f | M2: %f\n",
-            motor_M1.getRotation(),
-            motor_M2.getRotation());
+            motor_M1.getVelocity(),
+            motor_M2.getVelocity());
 
         // toggling the user led
         user_led = !user_led;
